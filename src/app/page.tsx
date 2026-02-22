@@ -24,6 +24,12 @@ interface UploadResult {
 
 type FilterType = "all" | "image" | "video" | "audio" | "other";
 
+interface StorageInfo {
+  used: number;
+  limit: number;
+  percentage: number;
+}
+
 interface Toast {
   id: number;
   message: string;
@@ -37,6 +43,56 @@ function formatFileSize(bytes: number): string {
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
   const size = bytes / Math.pow(1024, i);
   return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+}
+
+function StorageBar({ storage, files, onDelete }: {
+  storage: StorageInfo;
+  files: UploadedFile[];
+  onDelete: (key: string) => void;
+}) {
+  const pct = Math.min(storage.percentage, 100);
+  const level = pct >= 90 ? "danger" : pct >= 75 ? "warning" : "normal";
+
+  const oldest = [...files]
+    .filter((f) => f.lastModified)
+    .sort((a, b) => new Date(a.lastModified!).getTime() - new Date(b.lastModified!).getTime())
+    .slice(0, 5);
+
+  return (
+    <div className={`storage-bar-wrapper ${level}`}>
+      <div className="storage-bar-header">
+        <span className="storage-bar-label">
+          storage: {formatFileSize(storage.used)} / {formatFileSize(storage.limit)}
+        </span>
+        <span className="storage-bar-pct">{pct.toFixed(1)}%</span>
+      </div>
+      <div className="storage-bar-track">
+        <div className="storage-bar-fill" style={{ width: `${pct}%` }} />
+      </div>
+      {level !== "normal" && oldest.length > 0 && (
+        <div className="storage-bar-oldest">
+          <div className="storage-bar-oldest-label">
+            {level === "danger" ? "running out of space — " : ""}oldest files:
+          </div>
+          <div className="storage-bar-oldest-list">
+            {oldest.map((f) => (
+              <div key={f.key} className="storage-bar-oldest-item">
+                <span className="storage-bar-oldest-name" title={f.key}>{f.name}</span>
+                <span className="storage-bar-oldest-size">{formatFileSize(f.size)}</span>
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => onDelete(f.key)}
+                  style={{ padding: "2px 8px", fontSize: "0.55rem" }}
+                >
+                  del
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function formatDate(dateStr: string | null): string {
@@ -501,6 +557,7 @@ function FileCard({
 
 function Dashboard({ onLogout }: { onLogout: () => void }) {
   const [files, setFiles] = useState<UploadedFile[]>([]);
+  const [storage, setStorage] = useState<StorageInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterType>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -541,6 +598,7 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
       if (!res.ok) throw new Error("Failed to fetch files");
       const data = await res.json();
       setFiles(data.files);
+      if (data.storage) setStorage(data.storage);
     } catch (err) {
       console.error("Failed to fetch files:", err);
       addToast("Failed to load files", "error");
@@ -634,6 +692,10 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
       </header>
 
       <div className="app-main">
+        {storage && (
+          <StorageBar storage={storage} files={files} onDelete={handleDeleteRequest} />
+        )}
+
         <UploadSection onUploadComplete={handleUploadComplete} addToast={addToast} />
 
         <div className="fade-in-up-delay-1">

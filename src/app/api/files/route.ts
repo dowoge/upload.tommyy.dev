@@ -5,6 +5,8 @@ import { getMediaType } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
+const BUCKET_LIMIT = parseInt(process.env.R2_BUCKET_LIMIT || String(10 * 1024 * 1024 * 1024), 10);
+
 export async function GET() {
   const authed = await isAuthenticated();
   if (!authed) {
@@ -47,9 +49,16 @@ export async function GET() {
       }
     }
 
+    const used = enrichedFiles.reduce((sum, f) => sum + f.size, 0);
+
     return NextResponse.json({
       files: enrichedFiles,
       count: enrichedFiles.length,
+      storage: {
+        used,
+        limit: BUCKET_LIMIT,
+        percentage: BUCKET_LIMIT > 0 ? Math.min((used / BUCKET_LIMIT) * 100, 100) : 0,
+      },
     });
   } catch (error) {
     console.error("Failed to list files:", error);

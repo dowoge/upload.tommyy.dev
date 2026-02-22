@@ -890,6 +890,118 @@ body::after {
   animation: fade-up 0.5s ease 0.3s forwards;
 }
 
+.storage-bar-wrapper {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border: 1px solid var(--accent-border);
+  background: var(--bg-card);
+}
+
+.storage-bar-wrapper.warning {
+  border-color: rgba(255, 217, 76, 0.3);
+}
+
+.storage-bar-wrapper.danger {
+  border-color: rgba(255, 76, 106, 0.3);
+}
+
+.storage-bar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.storage-bar-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.storage-bar-pct {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+.storage-bar-wrapper.warning .storage-bar-pct {
+  color: var(--warning);
+}
+
+.storage-bar-wrapper.danger .storage-bar-pct {
+  color: var(--danger);
+}
+
+.storage-bar-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(91, 206, 250, 0.1);
+  overflow: hidden;
+}
+
+.storage-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+.storage-bar-wrapper.warning .storage-bar-fill {
+  background: var(--warning);
+  box-shadow: 0 0 8px rgba(255, 217, 76, 0.3);
+}
+
+.storage-bar-wrapper.danger .storage-bar-fill {
+  background: var(--danger);
+  box-shadow: 0 0 8px var(--danger-glow);
+}
+
+.storage-bar-oldest {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.storage-bar-oldest-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.storage-bar-wrapper.danger .storage-bar-oldest-label {
+  color: var(--danger);
+}
+
+.storage-bar-oldest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.storage-bar-oldest-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.65rem;
+}
+
+.storage-bar-oldest-name {
+  color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.storage-bar-oldest-size {
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
 .vignette {
   position: fixed;
   inset: 0;
