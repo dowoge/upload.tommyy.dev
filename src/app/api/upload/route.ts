@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { uploadFile, listFiles } from "@/lib/r2";
+import { uploadFile, listFiles, BUCKET_LIMIT } from "@/lib/r2";
 import { v4 as uuidv4 } from "uuid";
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
-const BUCKET_LIMIT = parseInt(process.env.R2_BUCKET_LIMIT ?? String(10 * 1024 * 1024 * 1024));
 
 function sanitizeFilename(filename: string): string {
   return filename

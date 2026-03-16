@@ -149,31 +149,4 @@ export function getEmbedUrl(key: string): string {
   return `${appUrl}/view/${encodeURIComponent(key)}`;
 }
 
-export function getMediaCategory(
-  contentType: string
-): "image" | "video" | "audio" | "other" {
-  if (contentType.startsWith("image/")) return "image";
-  if (contentType.startsWith("video/")) return "video";
-  if (contentType.startsWith("audio/")) return "audio";
-  return "other";
-}
-
 export const BUCKET_LIMIT = parseInt(process.env.R2_BUCKET_LIMIT || String(10 * 1024 * 1024 * 1024), 10);
-
-export async function getBucketUsage(): Promise<{ used: number; limit: number; percentage: number }> {
-  const files = await listFiles();
-  const used = files.reduce((sum, f) => sum + f.size, 0);
-  return {
-    used,
-    limit: BUCKET_LIMIT,
-    percentage: BUCKET_LIMIT > 0 ? (used / BUCKET_LIMIT) * 100 : 0,
-  };
-}
-
-export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return "0 B";
-  const units = ["B", "KB", "MB", "GB", "TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  const size = bytes / Math.pow(1024, i);
-  return `${size.toFixed(i === 0 ? 0 : 2)} ${units[i]}`;
-}

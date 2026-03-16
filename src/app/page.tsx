@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { formatFileSize } from "@/lib/types";
 
 interface UploadedFile {
   key: string;
@@ -35,14 +36,6 @@ interface Toast {
   message: string;
   type: "success" | "error" | "info";
   fadingOut?: boolean;
-}
-
-function formatFileSize(bytes: number): string {
-  if (bytes === 0) return "0 B";
-  const units = ["B", "KB", "MB", "GB", "TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  const size = bytes / Math.pow(1024, i);
-  return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
 function StorageBar({ storage, files, onDelete }: {
@@ -389,7 +382,6 @@ function UploadSection({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/*,video/*,audio/*"
             onChange={handleFileSelect}
             style={{ display: "none" }}
           />
@@ -405,7 +397,7 @@ function UploadSection({
             {uploading ? "uploading..." : "drop file here or click to browse"}
           </div>
           <div className="upload-zone-hint">
-            images, videos, audio &middot; max 100mb
+            all file types &middot; max 100mb
           </div>
         </div>
 
@@ -638,7 +630,16 @@ function Dashboard({ onLogout }: { onLogout: () => void }) {
         throw new Error(data.error || "Delete failed");
       }
 
+      const deletedFile = files.find((f) => f.key === confirmDelete);
       setFiles((prev) => prev.filter((f) => f.key !== confirmDelete));
+      if (deletedFile && storage) {
+        const newUsed = Math.max(0, storage.used - deletedFile.size);
+        setStorage({
+          ...storage,
+          used: newUsed,
+          percentage: storage.limit > 0 ? Math.min((newUsed / storage.limit) * 100, 100) : 0,
+        });
+      }
       addToast("File deleted", "success");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Delete failed";

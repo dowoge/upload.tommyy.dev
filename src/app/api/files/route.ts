@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 import { isAuthenticated } from "@/lib/auth";
-import { listFiles, getFileMetadata } from "@/lib/r2";
+import { listFiles, getFileMetadata, BUCKET_LIMIT } from "@/lib/r2";
 import { getMediaType } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-
-const BUCKET_LIMIT = parseInt(process.env.R2_BUCKET_LIMIT || String(10 * 1024 * 1024 * 1024), 10);
 
 export async function GET() {
   const authed = await isAuthenticated();

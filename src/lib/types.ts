@@ -1,14 +1,3 @@
-export interface FileMetadata {
-  key: string;
-  name: string;
-  size: number;
-  contentType: string;
-  mediaType: MediaType;
-  uploadedAt: string;
-  url: string;
-  embedUrl: string;
-}
-
 export type MediaType = "image" | "video" | "audio" | "other";
 
 const IMAGE_EXTENSIONS = new Set([
@@ -23,7 +12,7 @@ const VIDEO_EXTENSIONS = new Set([
 
 const AUDIO_EXTENSIONS = new Set([
   ".mp3", ".wav", ".ogg", ".flac", ".aac",
-  ".m4a", ".wma", ".opus", ".webm",
+  ".m4a", ".wma", ".opus",
 ]);
 
 const IMAGE_MIMES = new Set([
@@ -82,6 +71,3 @@ export function formatFileSize(bytes: number): string {
   return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
-export function getAcceptString(): string {
-  return ["image/*", "video/*", "audio/*"].join(",");
-}
